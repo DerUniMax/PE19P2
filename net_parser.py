@@ -1,3 +1,5 @@
+from pomegranate import bayes
+
 def parse(dataset):
   dataset["Zimmerzahl"] = dataset["Zimmerzahl"].map(_parse_room_amount)
   

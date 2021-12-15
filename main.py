@@ -1,4 +1,5 @@
 import pandas as pd
+from pomegranate import bayes
 from net_parser import parse
 
 
