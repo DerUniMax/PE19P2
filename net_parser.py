@@ -1,11 +1,16 @@
-from pomegranate import bayes
+from pomegranate import BayesianNetwork as bayes
+import matplotlib
 
 def parse(dataset):
   dataset["Zimmerzahl"] = dataset["Zimmerzahl"].map(_parse_room_amount)
   
-  _assemble_net(dataset)
+  model: BayesianNetwork = bayes.from_samples(dataset)
   
-  print(dataset[dataset["Zimmerzahl"] == None])
+  model.plot()
+  
+  print(model)
+  
+  _assemble_net(dataset)
 
 def _assemble_net(dataset):
   pass
