@@ -1,5 +1,5 @@
 import bnlearn
-import pandas as pd # for data manipulation
+import pandas as pd
 
 # Import example dataset
 df= pd.read_csv('P1_DP13_Wohnungen_X.csv', encoding='utf-8', delimiter=';')
