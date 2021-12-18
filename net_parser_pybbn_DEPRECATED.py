@@ -8,6 +8,8 @@ from pybbn.graph.node import BbnNode
 from pybbn.graph.variable import Variable
 from pybbn.pptc.inferencecontroller import InferenceController
 
+#  DEPRECATED
+
 def parse(dataset: pd.DataFrame):
   structure = {
     "Miete": [],
