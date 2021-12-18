@@ -1,10 +1,10 @@
 from pomegranate import *
 from itertools import product
-import pandas
+import pandas as pd
 import matplotlib
 import os
 
-def parse(dataset: pandas.DataFrame):
+def parse(dataset: pd.DataFrame):
   people_stuff = ["Kleinfamilie", "DINK", "Alter", "SingleHighIncome", "Expatriate", "Rentnerpaar", "Studierende"]
   
   # nodes = dict()
@@ -33,14 +33,41 @@ def parse(dataset: pandas.DataFrame):
   # network.plot("plot.pdf")
   
   # return network
-  test = [{'Zimmerzahl': '5-6 Zimmer', 'Stockwerk': '1.Stock', 'Hausmeister': 'nein'}]
-  people_stuff.remove("Kleinfamilie")
-  dataset = dataset.drop(people_stuff, axis=1)
-  dataset = dataset.drop("S-Bahn", axis=1)
-  dataset = dataset[dataset["Kleinfamilie"] == "ja"]
-  print(_calc_prob_distribution(dataset, "Kleinfamilie", []))
+  # test = [{'Zimmerzahl': '5-6 Zimmer', 'Stockwerk': '1.Stock', 'Hausmeister': 'nein'}]
+  # people_stuff.remove("Kleinfamilie")
+  # dataset = dataset.drop(people_stuff, axis=1)
+  # dataset = dataset.drop(["S-Bahn", "Hausmeister", "Stockwerk", ""], axis=1)
+  # dataset = dataset[dataset["Kleinfamilie"] == "ja"]
+  # print(_calc_prob_distribution(dataset, "Kleinfamilie", []))
+  
+  def probs(data, child, parents=[]):
+      if len(parents) == 0:
+        # Calculate probabilities
+        prob=pd.crosstab(data[child], 'Empty', margins=False, normalize='columns').sort_index().to_numpy().reshape(-1).tolist()
+      elif len(parents) > 0:
+        print([data[parent] for parent in parents])
+        print([data[parents[0]], data[parents[1]]])
+        
+        prob=pd.crosstab([data[parents[0]], data[parents[1]]], data[child], margins=False, normalize='index').sort_index().to_numpy().reshape(-1).tolist()
+        
+      else: print("Error in Probability Frequency Calculations")
+      return prob
+  
+  net = BayesianNetwork("Wohnungen")
+  
+  Kleinfamilie = Node(DiscreteDistribution(probs(dataset, child='Kleinfamilie', parents=['Zimmerzahl', 'Kindergarten'])), name="Kleinfamilie")
+  Zimmerzahl = Node(DiscreteDistribution(probs(dataset, "Zimmerzahl")), name="Zimmerzahl")
+  Kindergarten = Node(DiscreteDistribution(probs(dataset, "Kindergarten"), name="Kindergarten"))
+  
+  net.add_nodes(Kleinfamilie, Zimmerzahl, Kindergarten)
+  net.add_edge(Zimmerzahl, Kleinfamilie)
+  net.add_edge(Kindergarten, Kleinfamilie)
+  
+  net.bake()
+  
+  print(net)
 
-def _create_node(series: pandas.Series, name: str) -> Node:
+def _create_node(series: pd.Series, name: str) -> Node:
   counts = series.value_counts()
   full_amount = series.size - 1
   
@@ -58,7 +85,7 @@ def _create_node(series: pandas.Series, name: str) -> Node:
   
   return Node(DiscreteDistribution(probabilities), name=name)
 
-def _calc_probabilities(series: pandas.core.series.Series) -> dict:
+def _calc_probabilities(series: pd.core.series.Series) -> dict:
   counts = series.value_counts()
   full_amount = series.size - 1
   
@@ -69,7 +96,7 @@ def _calc_probabilities(series: pandas.core.series.Series) -> dict:
   
   return probabilities
 
-def _calc_prob_distribution(dataset: pandas.DataFrame, target_name: str, exclude):
+def _calc_prob_distribution(dataset: pd.DataFrame, target_name: str, exclude):
   working_set = dataset.drop(exclude, axis=1)
   target_options = working_set[target_name].unique()
   
@@ -99,12 +126,12 @@ def _evaluate_combinations(column_combinations: [tuple], column_names, filtered_
     opt_list = list(optional)
     opt_list.append(probability)
     ret.append(opt_list)
-    # if probability > 0.0:
-    print(opt_list)
+    if probability > 0.0:
+      print(opt_list)
   
   return ret
 
-def _assemble_conditional_prob_table_part(filtered_set: pandas.DataFrame):
+def _assemble_conditional_prob_table_part(filtered_set: pd.DataFrame):
   column_uniques = dict()
   
   for column in filtered_set.columns:
