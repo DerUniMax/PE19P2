@@ -37,6 +37,7 @@ def parse(dataset: pandas.DataFrame):
   people_stuff.remove("Kleinfamilie")
   dataset = dataset.drop(people_stuff, axis=1)
   dataset = dataset.drop("S-Bahn", axis=1)
+  dataset = dataset[dataset["Kleinfamilie"] == "ja"]
   print(_calc_prob_distribution(dataset, "Kleinfamilie", []))
 
 def _create_node(series: pandas.Series, name: str) -> Node:
@@ -98,7 +99,7 @@ def _evaluate_combinations(column_combinations: [tuple], column_names, filtered_
     opt_list = list(optional)
     opt_list.append(probability)
     ret.append(opt_list)
-    
+    # if probability > 0.0:
     print(opt_list)
   
   return ret

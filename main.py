@@ -1,6 +1,6 @@
 import pandas as pd
 from pomegranate import bayes
-from net_parser import parse
+from net_parser_pybbn import parse
 
 
 
