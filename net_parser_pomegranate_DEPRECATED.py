@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib
 import os
 
+# DEPRECATED
+
 def parse(dataset: pd.DataFrame):
   people_stuff = ["Kleinfamilie", "DINK", "Alter", "SingleHighIncome", "Expatriate", "Rentnerpaar", "Studierende"]
   
