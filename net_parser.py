@@ -35,7 +35,8 @@ def parse(dataset: pandas.DataFrame):
   # return network
   test = [{'Zimmerzahl': '5-6 Zimmer', 'Stockwerk': '1.Stock', 'Hausmeister': 'nein'}]
   people_stuff.remove("Kleinfamilie")
-  dataset.drop(people_stuff, axis=1)
+  dataset = dataset.drop(people_stuff, axis=1)
+  dataset = dataset.drop("S-Bahn", axis=1)
   print(_calc_prob_distribution(dataset, "Kleinfamilie", []))
 
 def _create_node(series: pandas.Series, name: str) -> Node:
@@ -82,32 +83,36 @@ def _calc_prob_distribution(dataset: pandas.DataFrame, target_name: str, exclude
   
   return conditional_table
 
-def _evaluate_combinations(column_combinations: [dict], filtered_set):
-  print(column_combinations)
+def _evaluate_combinations(column_combinations: [tuple], column_names, filtered_set):
+  print("oh ffs")
+  ret = []
   for optional in column_combinations:
     conditions = ""
-    for key in optional.keys():
-      conditions += f"({key} == \"{optional[key]}\") & "
+    for i in range(len(column_names)):
+      conditions += f"({column_names[i]} == \"{optional[i]}\") & "
     
     conditions = conditions.rstrip("& ")
     
     amount = filtered_set.query(conditions).size
     probability = amount/filtered_set.size
-    optional["prob"] = probability
+    opt_list = list(optional)
+    opt_list.append(probability)
+    ret.append(opt_list)
     
-  return column_combinations
+    print(opt_list)
+  
+  return ret
 
 def _assemble_conditional_prob_table_part(filtered_set: pandas.DataFrame):
   column_uniques = dict()
-  probabilities = []
+  
   for column in filtered_set.columns:
     column_uniques[column] = filtered_set[column].unique()
   
-  combinations = product(*column_uniques)
+  combinations = product(*column_uniques.values())
+  keys = list(column_uniques.keys())
   
-  print(type(combinations))
-  
-  return _evaluate_combinations(combinations, filtered_set)
+  return _evaluate_combinations(combinations, keys, filtered_set)
 
 # def _generate_combinations(columns: dict):
 #   for options in columns:
