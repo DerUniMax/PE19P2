@@ -1,5 +1,6 @@
 # PE19P2
 https://dhbwstg-my.sharepoint.com/:w:/g/personal/inf19226_lehre_dhbw-stuttgart_de/EfawEq4PUW5Gi1zzic_jNAAB2DFjxFkfwHEgHchlXf-wRg?e=FE2NmY
+
 Wer wohnt hier?
 
 Einzusetzende Methode: Probabilistische Netze
