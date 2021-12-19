@@ -42,30 +42,24 @@ def parse(dataset: pd.DataFrame):
   # dataset = dataset[dataset["Kleinfamilie"] == "ja"]
   # print(_calc_prob_distribution(dataset, "Kleinfamilie", []))
   
-  def probs(data, child, parents=[]):
-      if len(parents) == 0:
-        # Calculate probabilities
-        prob=pd.crosstab(data[child], 'Empty', margins=False, normalize='columns').sort_index().to_numpy().reshape(-1).tolist()
-      elif len(parents) > 0:
-        print([data[parent] for parent in parents])
-        print([data[parents[0]], data[parents[1]]])
-        
-        prob=pd.crosstab([data[parents[0]], data[parents[1]]], data[child], margins=False, normalize='index').sort_index().to_numpy().reshape(-1).tolist()
-        
-      else: print("Error in Probability Frequency Calculations")
-      return prob
-  
   net = BayesianNetwork("Wohnungen")
   
-  Kleinfamilie = Node(DiscreteDistribution(probs(dataset, child='Kleinfamilie', parents=['Zimmerzahl', 'Kindergarten'])), name="Kleinfamilie")
-  Zimmerzahl = Node(DiscreteDistribution(probs(dataset, "Zimmerzahl")), name="Zimmerzahl")
-  Kindergarten = Node(DiscreteDistribution(probs(dataset, "Kindergarten"), name="Kindergarten"))
+  Kleinfamilie = _create_node_stub(dataset, "Kleinfamilie")
+  Zimmerzahl = _create_node_stub(dataset, "Zimmerzahl")
+  # Kleinfamilie = _create_node(dataset, "Kleinfamilie", parents=["Zimmerzahl"])
   
-  net.add_nodes(Kleinfamilie, Zimmerzahl, Kindergarten)
-  net.add_edge(Zimmerzahl, Kleinfamilie)
-  net.add_edge(Kindergarten, Kleinfamilie)
+  net.add_nodes(Kleinfamilie, Zimmerzahl)
+  # net.add_edge(Zimmerzahl, Kleinfamilie)
+  # net.add_edge(Kindergarten, Kleinfamilie)
+  
+  print(net)
   
   net.bake()
+  
+  print("baked")
+  
+  net = net.fit(dataset.drop(dataset.columns.difference(["Kleinfamilie", "Zimmerzahl"]), axis=1))
+  # fit(net, dataset)
   
   print(net)
 
@@ -87,32 +81,6 @@ def _create_node(series: pd.Series, name: str) -> Node:
   
   return Node(DiscreteDistribution(probabilities), name=name)
 
-def _calc_probabilities(series: pd.core.series.Series) -> dict:
-  counts = series.value_counts()
-  full_amount = series.size - 1
-  
-  probabilities = dict()
-  
-  for key in counts.keys():
-    probabilities[key] = float(counts[key])/float(full_amount) + 0.0
-  
-  return probabilities
-
-def _calc_prob_distribution(dataset: pd.DataFrame, target_name: str, exclude):
-  working_set = dataset.drop(exclude, axis=1)
-  target_options = working_set[target_name].unique()
-  
-  conditional_table = []
-  
-  for option in target_options:
-    filtered_set = working_set[working_set[target_name] == option]
-    # filtered_set = filtered_set.drop(target_name, axis=1)
-    conditional_table.append(_assemble_conditional_prob_table_part(filtered_set))
-  
-  conditional_table = ConditionalProbabilityTable(conditional_table)
-  
-  return conditional_table
-
 def _evaluate_combinations(column_combinations: [tuple], column_names, filtered_set):
   print("oh ffs")
   ret = []
@@ -133,27 +101,50 @@ def _evaluate_combinations(column_combinations: [tuple], column_names, filtered_
   
   return ret
 
-def _assemble_conditional_prob_table_part(filtered_set: pd.DataFrame):
+def _assemble_conditional_prob_table(filtered_set: pd.DataFrame, name: str, parents: [dict]):
   column_uniques = dict()
   
   for column in filtered_set.columns:
     column_uniques[column] = filtered_set[column].unique()
   
+  combinations = []
+  
+  for parent in parent_probs:
+    combination = []
+    for key in parent["Probs"].keys():
+      combination.append(key)
+    combinations.append(combination)
+  
   combinations = product(*column_uniques.values())
   keys = list(column_uniques.keys())
   
-  return _evaluate_combinations(combinations, keys, filtered_set)
-
-# def _generate_combinations(columns: dict):
-#   for options in columns:
-#     for options[1]
-
-def _check_probabilities(probabilities: dict) -> bool:
-  overall_prob = 0
-  for key in probabilities.keys():
-    overall_prob += probabilities[key]
+  evaluated = _evaluate_combinations(combinations, keys, filtered_set)
   
-  return bool(overall_prob == 1)
+  return ConditionalProbabilityTable(evaluated, parent_probs)
+
+def _create_node(df: pd.DataFrame, name: str, parents = [dict]):
+  print("Creating node: ", name)
+  drop_list = []
+  
+  for parent in parents:
+    drop_list.append(parent['Name'])
+  
+  # drop_list.append(name)
+  filtered_set = df.drop(df.columns.difference(drop_list), axis=1)
+  
+  distribution = _assemble_conditional_prob_table(filtered_set, name, parents)
+  
+  return Node(distribution, name=name)
+
+def _create_node_stub(df: pd.DataFrame, name, parents=[]):
+  keys = df[name].unique()
+  
+  prob_dist = dict()
+  
+  for key in keys:
+    prob_dist[key] = 0
+  
+  return Node(DiscreteDistribution(prob_dist), name=name)
 
 def _add_custom_edges(network: BayesianNetwork, nodes: dict):
   network.add_edge(nodes["DINK"], nodes["Rentnerpaar"])

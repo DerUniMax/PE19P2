@@ -1,11 +1,8 @@
-import bnlearn
 import pandas as pd
+from pgmpy.models import BayesianNetwork
 
-# Import example dataset
-df = pd.read_csv('P1_DP13_Wohnungen_X.csv', encoding='utf-8', delimiter=';')
-print(df)
+df = pd.read_csv("P1_DP13_Wohnungen_X.csv", sep=";")
 
-# Define the network structure
 edges = [
   ('Quadratmeter', 'Zimmerzahl'),
          ('Quadratmeter', 'Miete'),
@@ -66,18 +63,8 @@ edges = [
          ('Kueche', 'SingleHighIncome')
          ]
 
-# Make the actual Bayesian DAG
-DAG = bnlearn.make_DAG(edges)
+net = BayesianNetwork(edges)
 
-# Plot the DAG
-# bnlearn.plot(DAG, interactive=True)
+net.fit(df, n_jobs=10)
 
-# learn the parameter
-DAG = bnlearn.parameter_learning.fit(DAG, df)
-
-bnlearn.print_CPD(DAG)
-
-# Print the learned CPDs as interactive plot
-# bnlearn.print_CPD(DAG)
-
-# bnlearn.save(DAG, filepath='oh_god_please_dont_crash', overwrite=True)
+print(net)
