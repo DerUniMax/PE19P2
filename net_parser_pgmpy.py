@@ -1,28 +1,49 @@
-from edgesAndNodes import edges, nodes
 import pandas as pd
+from edgesAndNodes import edges, nodes
+from pgmpy.readwrite import BIF
 from pgmpy.models import BayesianNetwork
 from pgmpy.estimators import BayesianEstimator
 import networkx as nx
 import matplotlib.pyplot as plt
 from pgmpy.estimators import MaximumLikelihoodEstimator
 
-df = pd.read_csv("P1_DP13_Wohnungen_X.csv", sep=";")
+# df = pd.read_csv("P1_DP13_Wohnungen_X.csv", sep=";")
 
-net = BayesianNetwork(edges)
+def parse(df: pd.DataFrame, edges: [tuple]):
+  nodes = _extract_nodes(edges)
+  
+  net = BayesianNetwork(edges)
 
-# net.fit(df, n_jobs=10)
-# print(net)
+  estimator = BayesianEstimator(net, df)
 
-estimator = BayesianEstimator(net, df)
+  for node in nodes:
+    print('Estimate: ', node)
+    CPD = estimator.estimate_cpd(node, prior_type='BDeu')
+    net.add_cpds(CPD)
+    print(CPD)
 
-# schnell für alle, falsche estimates, immer gleich 50%
-for node in nodes:
-	CPD = estimator.estimate_cpd(node, prior_type='BDeu')
-	print(CPD)
+  print('Saving xmlbif')
 
-# braucht allein für die Kleinfamilie ewig
-# likelihood = MaximumLikelihoodEstimator(net, df).estimate_cpd('Kleinfamilie')
-# print(likelihood)
+  net.save("net.xml", filetype='xmlbif')
 
-nx.draw_kamada_kawai(net, with_labels=True)
-plt.show()
+  print('Saved xmlbif')
+
+  return net
+
+def _extract_nodes(edges: [tuple]) -> [str]:
+  def is_in_list(list: [], search_item) -> bool:
+    for item in list:
+      if search_item == item:
+        return True
+    return False
+  
+  node_list = []
+  
+  for edge in edges:
+    if not is_in_list(node_list, edge[0]):
+      node_list.append(edge[0])
+    
+    if not is_in_list(node_list, edge[1]):
+      node_list.append(edge[1])
+  
+  return node_list
