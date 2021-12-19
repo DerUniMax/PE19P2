@@ -6,6 +6,7 @@ edges = [
 	('Garage', 'Miete'),
 	('Stockwerk', 'Aufzug'),
 	('Stockwerk', 'Terrasse'),
+  ('Stockwerk', 'Balkon'),
 	('Alter', 'Kueche'),
 	('Alter', 'Stockwerk'),
 	('Balkon', 'Terrasse'),

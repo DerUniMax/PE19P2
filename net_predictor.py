@@ -1,12 +1,14 @@
 from pgmpy.models import BayesianNetwork
-from pgmpy.readwrite import XMLBIFReader
+from pgmpy.readwrite import BIFReader
+from pgmpy.factors.discrete import TabularCPD
 import pandas as pd
-import numpy as np
+import math
+import json
 
 def predict_file(filename: str, predict: pd.DataFrame):
-  net = XMLBIFReader(filename).get_model()
+  net = _parse_json(filename)
   
-  predict_net(net, predict)
+  return predict_net(net, predict)
 
 def predict_net(net: BayesianNetwork, predict: pd.DataFrame):
   predictdfs = _parse_prediction_df(predict)
@@ -14,7 +16,6 @@ def predict_net(net: BayesianNetwork, predict: pd.DataFrame):
   predictions = []
   
   for predictdf in predictdfs:
-    print(predictdf)
     predictions.append(net.predict(predictdf))
   
   return predictions
@@ -23,8 +24,7 @@ def _parse_prediction_df(predictdf: pd.DataFrame) -> [pd.DataFrame]:
   dfs = []
   
   for row in predictdf.to_numpy():
-    print(row)
-    rowdf = pd.DataFrame(row, predictdf.columns)
+    rowdf = pd.DataFrame([row], columns=predictdf.columns)
     
     columns = []
     
@@ -32,8 +32,32 @@ def _parse_prediction_df(predictdf: pd.DataFrame) -> [pd.DataFrame]:
       if type(rowdf.iloc[0][key]) != type("") and math.isnan(rowdf.iloc[0][key]):
         columns.append(key)
     
-    rowdf.drop(columns, axis=1)
+    rowdf = rowdf.drop(columns, axis=1)
     
     dfs.append(rowdf)
   
   return dfs
+
+def _parse_json(filename: str):
+  with open(filename, "r") as file:
+    save_obj = json.load(file)
+  
+  net = BayesianNetwork([(edge[0], edge[1]) for edge in save_obj['edges']])
+  
+  for node in save_obj['nodes']:
+    net.add_node(node)
+  
+  for cpd in save_obj['cpds']:
+    net.add_cpds(_create_cdp(cpd))
+  
+  for cpd in net.get_cpds():
+    print(cpd)
+  
+  return net
+
+def _create_cdp(cpd_dict: dict) -> TabularCPD:
+  evidence_card = []
+  for evidence in cpd_dict['evidence']:
+    evidence_card.append(len(cpd_dict['state_names'][evidence]))
+  
+  return TabularCPD(variable=cpd_dict['variable'], variable_card=cpd_dict['variable_card'], evidence=cpd_dict['evidence'], evidence_card=evidence_card, state_names=cpd_dict['state_names'], values=cpd_dict['values'])
