@@ -6,7 +6,7 @@ edges = [
 	('Garage', 'Miete'),
 	('Stockwerk', 'Aufzug'),
 	('Stockwerk', 'Terrasse'),
-  ('Stockwerk', 'Balkon'),
+  	('Stockwerk', 'Balkon'),
 	('Alter', 'Kueche'),
 	('Alter', 'Stockwerk'),
 	('Balkon', 'Terrasse'),
@@ -60,5 +60,3 @@ edges = [
 	('Bad', 'SingleHighIncome'),
 	('Kueche', 'SingleHighIncome')
 ]
-
-nodes = ['Kleinfamilie', 'Studierende', 'Expatriate', 'Rentnerpaar', 'DINK', 'SingleHighIncome', "Zimmerzahl","Stockwerk","Hausmeister","Kindergarten","Schule","S-Bahn","Garage","Miete","Nebenkosten","Alter","Aufzug","Lage","Entfernung","Kaution","Kueche","Bad","Balkon","Terrasse","Kehrwoche","Quadratmeter"]

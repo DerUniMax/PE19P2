@@ -1,5 +1,4 @@
 from pgmpy.models import BayesianNetwork
-from pgmpy.readwrite import BIFReader
 from pgmpy.factors.discrete import TabularCPD
 import pandas as pd
 import math

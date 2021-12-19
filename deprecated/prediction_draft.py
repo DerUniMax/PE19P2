@@ -4,7 +4,7 @@ import math
 
 dag = bnlearn.load(filepath="oh_god_please_dont_crash.pkl")
 
-df = pd.read_csv("input.csv", sep=';')
+df = pd.read_csv("../input.csv", sep=';')
 
 columns = []
 

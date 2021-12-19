@@ -2,11 +2,10 @@ import pandas as pd
 import argparse
 import net_predictor
 from net_parser import parse
-from edgesAndNodes import edges
+from net_edges import edges
 
 def main():
   parser = argparse.ArgumentParser()
-  group = parser.add_argument_group()
   
   parser.add_argument('-b', '--build', action="store_true", help="""flag for forcing the program to create a new Bayesian Network depending on the input data. 
                       The predictions for the file using the --predictionfile arg will still be performed""")
