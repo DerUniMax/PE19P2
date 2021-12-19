@@ -1,17 +1,45 @@
 import pandas as pd
+import argparse
 import net_predictor
-from pomegranate import bayes
-from net_parser_pgmpy import parse
+from net_parser import parse
 from edgesAndNodes import edges
 
-
-def __main__():
-  dataset = pd.read_csv("./P1_DP13_Wohnungen_X.csv", sep=";")
-
-  net = parse(dataset, edges)
+def main():
+  parser = argparse.ArgumentParser()
+  group = parser.add_argument_group()
   
-  predict_set = pd.read_csv("input.csv", sep=";")
+  parser.add_argument('-b', '--build', action="store_true", help="""flag for forcing the program to create a new Bayesian Network depending on the input data. 
+                      The predictions for the file using the --predictionfile arg will still be performed""")
   
-  print(net_predictor.predict_file("net.xml", predict_set))
+  parser.add_argument('-d', '--dataset', default="P1_DP13_Wohnungen_X.csv",help="csv file (';' seperated) with the base dataset")
+  
+  parser.add_argument('-o', '--outfile', default="net.json", help='file path for the save file of the created Bayesian Network')
+  
+  parser.add_argument('-p', '--predictionfile', default="input.csv", help="csv file (';' seperated) with the incomplete Datasets for prediction")
+  
+  parser.add_argument('-n', '--netfile', default="net.json", help="json file with the Bayesian Network to use in the prediction")
+  
+  args = parser.parse_args()
+  
+  predict_set = pd.read_csv(args.predictionfile, sep=";")
+  
+  if args.build:
+    dataset = pd.read_csv(args.dataset, sep=";")
 
-__main__()
+    net = parse(dataset, edges, args.outfile)
+    
+    prediction_results = net_predictor.predict_net(net, predict_set)
+    
+    # printing the prediction results
+    for result in prediction_results:
+      print(result)
+    
+  else:
+    prediction_results = net_predictor.predict_file(args.netfile, predict_set)
+    
+    # printing the prediction results
+    for result in prediction_results:
+      print(result)
+
+if __name__ == '__main__':
+  main()
