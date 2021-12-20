@@ -18,6 +18,8 @@ def main():
   
   parser.add_argument('-n', '--netfile', default="net.json", help="json file with the Bayesian Network to use in the prediction")
   
+  parser.add_argument('-pf', '--printfiles', action="store_true", help="Set if the prediction output should also be printed to files")
+  
   args = parser.parse_args()
   
   predict_set = pd.read_csv(args.predictionfile, sep=";")
@@ -36,9 +38,15 @@ def main():
   else:
     prediction_results = net_predictor.predict_file(args.netfile, predict_set)
     
+    
     # printing the prediction results
-    for result in prediction_results:
-      print(result)
+    if args.printfiles:
+      for (i, result) in enumerate(prediction_results):
+        result.to_csv(f"output{i}.csv", sep=";")
+        print(result)
+    else:
+      for result in prediction_results:
+        print(result)
 
 if __name__ == '__main__':
   main()

@@ -58,8 +58,9 @@ def _parse_json(filename: str):
   for cpd in save_obj['cpds']:
     net.add_cpds(_create_cpd(cpd))
   
-  for cpd in net.get_cpds():
-    print(cpd)
+  # print the read cpds (takes a long time)
+  # for cpd in net.get_cpds():
+  #   print(cpd)
   
   return net
 
