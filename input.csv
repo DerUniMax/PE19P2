@@ -1,3 +1,7 @@
 Zimmerzahl;Stockwerk;Hausmeister;Kindergarten;Schule;S-Bahn;Garage;Miete;Nebenkosten;Alter;Aufzug;Lage;Entfernung;Kaution;Kueche;Bad;Balkon;Terrasse;Kehrwoche;Quadratmeter;Studierende;Kleinfamilie;DINK;SingleHighIncome;Expatriate;Rentnerpaar
-5-6 Zimmer;1.Stock;nein;fern;erreichbar;;ja;751-800;ueber 300;;;Nebenstrasse;5-10 km;;Kueche (alt);Dusche + Wanne;nein;nein;nein;111-120;nein;nein;nein;;;
-2-3 Zimmer;;nein;nah;erreichbar;nah;ja;451-500;101-150;4-7 Jahre;;;5-10 km;1000-1500;Kueche (alt);;nein;nein;nein;51-60;;;;;;
+5-6 Zimmer;;nein;fern;erreichbar;;ja;751-800;ueber 300;76-100 Jahre;ja;;5-10 km;1000-1500;Kueche (alt);;;nein;nein;111-120;;;;;;nein
+4 Zimmer;4.Stock;ja;nah;;erreichbar;nein;551-600;;ueber 100;ja;Wohngebiet;;;keine;Dusche + Wanne;;;nein;81-90;;;;;;nein
+3 Zimmer;EG;;fern;;erreichbar;ja;;101-150;21-30 Jahre;ja;Nebenstrasse;11-20 km;keine;;Dusche;;nein;nein;;;;;;;nein
+Zwei Zimmer;;nein;fern;nah;nein;nein;301-350;50-100;;ja;Nebenstrasse;> 30 km;keine;Kueche (alt);;;ja;nein;31-40;;;;;;nein
+2-3 Zimmer;;;erreichbar;erreichbar;;nein;451-500;;7-10 Jahre;nein;Wohngebiet;;;Kueche (neu);Badewanne;;nein;nein;51-60;;;;;;nein
+2-3 Zimmer;EG;nein;nah;erreichbar;erreichbar;nein;451-500;101-150;11-15 Jahre;ja;;> 30 km;1000-1500;Kueche (alt);Dusche + Wanne;;nein;nein;;;;;;;nein
